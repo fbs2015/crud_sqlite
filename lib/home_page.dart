@@ -11,6 +11,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
   Contact _contact = Contact(id: '',name: '',phoneNumber:'');
+  List<Contact> _contacts = [];
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Center(
           child: Text('Titulo',
-            style: TextStyle(color: Color.fromARGB(66, 0, 187, 212),
+            style: TextStyle(color: Color.fromARGB(43, 33, 100, 243),
             ),
           ),
         ),
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _form(),  
+            _list(),
           ],         
         ),
       ), 
@@ -56,7 +58,7 @@ class _HomePageState extends State<HomePage> {
             onSaved: (value) => setState(() => _contact.phoneNumber = value ?? ''),
             validator:(value){
               if(value!.trim().isEmpty){return 'This field is required';}
-              if(value!.trim().length != 11){return 'This field must contain 11 numbers';}
+              if(value.trim().length != 11){return 'This field must contain 11 numbers';}
               else{return null;}
             }
           ),
@@ -68,18 +70,49 @@ class _HomePageState extends State<HomePage> {
               color: Color.fromARGB(43, 33, 100, 243),
               textColor: Colors.white,
             ),
-          ),
+          ),          
         ],
       ),
     ),
   );
 
-  _list() => Container();
+  _list() => Expanded(    
+    child: Card(      
+      margin: EdgeInsets.fromLTRB(20, 30, 20, 0),
+      child: ListView.builder(        
+        padding: EdgeInsets.all(8),
+        itemBuilder: (context, index){
+          return Column(            
+            children: [              
+              ListTile(                
+                leading: Icon(
+                  Icons.account_circle,
+                  color: Color.fromARGB(43, 33, 100, 243),
+                  size: 40.0),
+                title: Text(_contacts[index].name.toUpperCase(),
+                style: TextStyle(
+                  color: Color.fromARGB(43, 33, 100, 243), 
+                  fontWeight: FontWeight.bold),
+                ),  
+              ),
+              Divider(height: 5.0,)
+            ],  
+          ); 
+        },
+        itemCount: _contacts.length,
+      ),
+    ),
+  );
 
   _onSubmit(){
     var form = _formKey.currentState;
     if(form!.validate()){
+      _contact.id = '1';
       form.save();    
+      setState((){
+        _contacts.add(_contact);
+      });
+      form.reset();
       print(_contact.name);
     }
   }
