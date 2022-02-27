@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
   Contact _contact = Contact(id: '',name: '',phoneNumber:'');
-  List<Contact> _contacts = [];
+  final List<Contact> _contacts = [];
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
             child: RaisedButton(
               onPressed: (){_onSubmit();},
               child: Text('Submit'),
-              color: Color.fromARGB(43, 33, 100, 243),
+              color: Color.fromARGB(43, 5, 9, 231),
               textColor: Colors.white,
             ),
           ),          
@@ -87,13 +87,18 @@ class _HomePageState extends State<HomePage> {
               ListTile(                
                 leading: Icon(
                   Icons.account_circle,
-                  color: Color.fromARGB(43, 33, 100, 243),
+                  color: Color.fromARGB(43, 5, 9, 231),
                   size: 40.0),
                 title: Text(_contacts[index].name.toUpperCase(),
                 style: TextStyle(
-                  color: Color.fromARGB(43, 33, 100, 243), 
+                  color: Color.fromARGB(43, 5, 9, 231), 
                   fontWeight: FontWeight.bold),
-                ),  
+                ), 
+                subtitle: Text(_contacts[index].phoneNumber,
+                  style: TextStyle(
+                    color: Color.fromARGB(43, 5, 9, 231), 
+                  ),
+                ), 
               ),
               Divider(height: 5.0,)
             ],  
