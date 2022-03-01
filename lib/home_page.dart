@@ -1,3 +1,4 @@
+import 'package:crud_sqlite/db/database_helper.dart';
 import 'package:crud_sqlite/models/contact.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +11,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
-  Contact _contact = Contact(id: '',name: '',phoneNumber:'');
-  final List<Contact> _contacts = [];
+  final Contact _contact = Contact(id: '',name: '',phoneNumber:'');
+  List<Contact> _contacts = [];
+  DatabaseHelper? _dbHelper;
+
+  @override
+  void initState(){
+    super.initState();
+    setState(() {
+      _dbHelper = DatabaseHelper.instance;
+    });
+    _refreshContactList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +50,13 @@ class _HomePageState extends State<HomePage> {
 
   _form() => Container(
     color: Colors.white,
-    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
     child: Form(
       key: _formKey,
       child: Column(
         children: [
           TextFormField(
-            decoration: InputDecoration(labelText: 'Full Name'),
+            decoration: const InputDecoration(labelText: 'Full Name'),
             onSaved: (value) => setState(() => _contact.name = value ?? ''),
             validator: (value){
               if(value!.trim().isEmpty){return 'This field is required';}
@@ -54,7 +65,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           TextFormField(
-            decoration: InputDecoration(labelText: 'Phone Number'),
+            decoration: const InputDecoration(labelText: 'Phone Number'),
             onSaved: (value) => setState(() => _contact.phoneNumber = value ?? ''),
             validator:(value){
               if(value!.trim().isEmpty){return 'This field is required';}
@@ -63,11 +74,11 @@ class _HomePageState extends State<HomePage> {
             }
           ),
           Container(
-            margin: EdgeInsets.all(10.0),
+            margin: const EdgeInsets.all(10.0),
             child: RaisedButton(
               onPressed: (){_onSubmit();},
-              child: Text('Submit'),
-              color: Color.fromARGB(43, 5, 9, 231),
+              child: const Text('Submit'),
+              color: const Color.fromARGB(43, 5, 9, 231),
               textColor: Colors.white,
             ),
           ),          
@@ -78,29 +89,29 @@ class _HomePageState extends State<HomePage> {
 
   _list() => Expanded(    
     child: Card(      
-      margin: EdgeInsets.fromLTRB(20, 30, 20, 0),
+      margin: const EdgeInsets.fromLTRB(20, 30, 20, 0),
       child: ListView.builder(        
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         itemBuilder: (context, index){
           return Column(            
             children: [              
               ListTile(                
-                leading: Icon(
+                leading:const Icon(
                   Icons.account_circle,
                   color: Color.fromARGB(43, 5, 9, 231),
                   size: 40.0),
                 title: Text(_contacts[index].name.toUpperCase(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color.fromARGB(43, 5, 9, 231), 
                   fontWeight: FontWeight.bold),
                 ), 
                 subtitle: Text(_contacts[index].phoneNumber,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color.fromARGB(43, 5, 9, 231), 
                   ),
                 ), 
               ),
-              Divider(height: 5.0,)
+              const Divider(height: 5.0,)
             ],  
           ); 
         },
@@ -109,17 +120,22 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  _onSubmit(){
+  _onSubmit() async {
     var form = _formKey.currentState;
-    if(form!.validate()){
-      _contact.id = '1';
+    _contact.id = null;
+    if(form!.validate()){      
       form.save();    
-      setState((){
-        _contacts.add(_contact);
-      });
+      await _dbHelper?.put(_contact);
       form.reset();
       print(_contact.name);
     }
+  }
+
+  _refreshContactList() async{
+    List<Contact> listContacts = await _dbHelper!.fetchContacts();
+    setState((){
+      _contacts = listContacts;
+    });
   }
 }
       

@@ -11,15 +11,15 @@ class Contact{
     required this.phoneNumber
   });
 
-  Contact.fromMap(Map<String, dynamic> map){
+  Contact.fromMap(Map<String, dynamic> map) {
     id = map[colId];
     name = map[colName];
     phoneNumber = map[colPhoneNumber];
   }
 
   String? id;
-  String name;
-  String phoneNumber;
+  String name = '';
+  String phoneNumber = '';
 
   Map<String, dynamic> toMap(){
     return {
