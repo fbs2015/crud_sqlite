@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
-  final Contact _contact = Contact(id: '',name: '',phoneNumber:'');
+  final Contact _contact = Contact(name: '',phoneNumber:'');
   List<Contact> _contacts = [];
   DatabaseHelper? _dbHelper;
 
@@ -121,13 +121,13 @@ class _HomePageState extends State<HomePage> {
   );
 
   _onSubmit() async {
-    var form = _formKey.currentState;
-    _contact.id = null;
+    var form = _formKey.currentState;   
     if(form!.validate()){      
       form.save();    
       await _dbHelper?.put(_contact);
       form.reset();
-      print(_contact.name);
+      _refreshContactList();
+      print(_contacts.length);
     }
   }
 
