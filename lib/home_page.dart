@@ -115,9 +115,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 trailing: IconButton(icon: Icon(Icons.delete_sweep),
-                onPressed:()async{
-                  //int i = int.parse(_contacts[index].id);
+                onPressed:()async{                 
                   await _dbHelper?.deleteContact(_contacts[index].id!);
+                  _resetForm();
+                  _refreshContactList();
                 } ),
                 onTap:(){
                   setState(() {
