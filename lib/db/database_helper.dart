@@ -8,7 +8,7 @@ class DatabaseHelper{
   static const _databaseVersion = 1;
   
   static final DatabaseHelper instance = DatabaseHelper._db();  
-  static Database? _database ; 
+  static Database? _database; 
   DatabaseHelper._db();
 
   Future<Database> get database async{
@@ -17,10 +17,8 @@ class DatabaseHelper{
     return _database!;
   }
 
-  _initDatabase() async{
-    print("_INITDARABASE");
-    final dbPath = await getApplicationDocumentsDirectory();
-    print(dbPath.path);
+  _initDatabase() async{    
+    final dbPath = await getApplicationDocumentsDirectory();   
     final path = join(dbPath.path,_databaseName);
 
     return await openDatabase( 
@@ -29,7 +27,7 @@ class DatabaseHelper{
       onCreate: (db, version) async{
         return await db.execute('''
           CREATE TABLE IF NOT EXISTS ${Contact.tblContact} (
-            ${Contact.colId} INTEGER AUTO_INCREMENT PRIMARY KEY, 
+            ${Contact.colId} INTEGER PRIMARY KEY, 
             ${Contact.colName} TEXT NOT NULL,
             ${Contact.colPhoneNumber} TEXT NOT NULL)
           ''');
@@ -39,7 +37,19 @@ class DatabaseHelper{
 
   Future<int> put(Contact? contact) async{
     Database? db = await database;
-    return db.insert(Contact.tblContact, contact!.toMap());
+    if(contact?.id == null){
+      int i = await db.insert(Contact.tblContact, contact!.toMap());
+      print(i);
+      return i;
+    }else{
+      return await db.update(Contact.tblContact, contact!.toMap(),
+      where: '${Contact.colId} = ?', whereArgs: [contact.id]);
+    }
+  }
+
+  Future<int> deleteContact(int id) async{
+    Database? db = await database;
+    return db.delete(Contact.tblContact, where: '${Contact.colId} = ?', whereArgs: [id]);
   }
 
   Future<List<Contact>> fetchContacts() async{

@@ -12,12 +12,13 @@ class Contact{
   });
 
   Contact.fromMap(Map<String, dynamic> map) {
-    id = map[colId].toString();
+    id = map[colId];//.toString();
     name = map[colName];
     phoneNumber = map[colPhoneNumber];
   }
 
-  String? id;
+  //String? id;
+  int? id;
   String name = '';
   String phoneNumber = '';
 

@@ -11,9 +11,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
-  final Contact _contact = Contact(name: '',phoneNumber:'');
+  Contact _contact = Contact(name: '',phoneNumber:'');
   List<Contact> _contacts = [];
   DatabaseHelper? _dbHelper;
+  final _ctrlName = TextEditingController();
+  final _ctrlPhoneNumber = TextEditingController();
 
   @override
   void initState(){
@@ -56,6 +58,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           TextFormField(
+            controller: _ctrlName,
             decoration: const InputDecoration(labelText: 'Full Name'),
             onSaved: (value) => setState(() => _contact.name = value ?? ''),
             validator: (value){
@@ -65,6 +68,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           TextFormField(
+            controller: _ctrlPhoneNumber,
             decoration: const InputDecoration(labelText: 'Phone Number'),
             onSaved: (value) => setState(() => _contact.phoneNumber = value ?? ''),
             validator:(value){
@@ -92,7 +96,7 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.fromLTRB(20, 30, 20, 0),
       child: ListView.builder(        
         padding: const EdgeInsets.all(8),
-        itemBuilder: (context, index){
+        itemBuilder: (context, index){         
           return Column(            
             children: [              
               ListTile(                
@@ -105,11 +109,24 @@ class _HomePageState extends State<HomePage> {
                   color: Color.fromARGB(43, 5, 9, 231), 
                   fontWeight: FontWeight.bold),
                 ), 
-                subtitle: Text(_contacts[index].phoneNumber,
+                subtitle: Text(_contacts[index].phoneNumber,                
                   style: const TextStyle(
                     color: Color.fromARGB(43, 5, 9, 231), 
                   ),
-                ), 
+                ),
+                trailing: IconButton(icon: Icon(Icons.delete_sweep),
+                onPressed:()async{
+                  //int i = int.parse(_contacts[index].id);
+                  await _dbHelper?.deleteContact(_contacts[index].id!);
+                } ),
+                onTap:(){
+                  setState(() {
+                    _resetForm();
+                    _contact = _contacts[index];
+                    _ctrlName.text = _contact.name;
+                    _ctrlPhoneNumber.text = _contact.phoneNumber;
+                  });
+                }, 
               ),
               const Divider(height: 5.0,)
             ],  
@@ -124,11 +141,19 @@ class _HomePageState extends State<HomePage> {
     var form = _formKey.currentState;   
     if(form!.validate()){      
       form.save();    
-      await _dbHelper?.put(_contact);
-      form.reset();
-      _refreshContactList();
-      print(_contacts.length);
+      await _dbHelper?.put(_contact);            
+      _refreshContactList();      
+      _resetForm();
     }
+  }
+
+  _resetForm(){
+    setState(() {
+      _formKey.currentState?.reset();
+      _ctrlName.clear();
+      _ctrlPhoneNumber.clear();
+      _contact.id = null;
+    });
   }
 
   _refreshContactList() async{
